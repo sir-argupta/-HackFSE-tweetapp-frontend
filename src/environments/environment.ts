@@ -1,7 +1,7 @@
 
 export const environment = {
   production: false,
-  ApiUrl: "http://localhost:8090/api/v1.0/tweets"
+  ApiUrl: "http://apiserver.hackfse.argupta.xyz:8090/api/v1.0/tweets"
 };
 
 /*

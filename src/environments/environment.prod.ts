@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  ApiUrl: 'prodURL',
+  ApiUrl: 'http://apiserver.hackfse.argupta.xyz:8090/api/v1.0/tweets',
 };
