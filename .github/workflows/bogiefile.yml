@@ -1,0 +1,49 @@
+name: Build and deploy Frontend to S3 & AWS ECS - TweetApp-HackFSE-Frontend
+
+on:
+  push:
+    branches:
+    - 
+
+env:
+  AWS_REGION: us-east-1                   
+  EC2_REMOTE_HOST: tweetapi-hackfse           
+  EC2_REMOTE_USER: ubuntu   
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: 16
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build
+      run: npm run build:prod
+
+    - name: Deploy to S3 instance
+      if: success()
+      run: aws s3 sync ./dist/tweet-app-frontend s3://tweet-app-frontend
+    
+    - name: Deploy to EC2 instance
+        uses: easingthemes/ssh-deploy@v2.1.5
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+          SOURCE: "./dist/tweet-app-frontend/*"
+          REMOTE_HOST: ${{ env.EC2_REMOTE_HOST }}
+          REMOTE_USER: ${{ env.EC2_REMOTE_USER }}
+          TARGET: "/var/www/html"
